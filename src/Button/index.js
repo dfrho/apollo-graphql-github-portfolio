@@ -1,12 +1,21 @@
 import React from 'react';
+
 import './style.css';
 
-const Button = ({ children, className, color = 'black', type = 'button', ...props
+const Button = ({
+  children,
+  className,
+  color = 'black',
+  type = 'button',
+  ...props
 }) => (
     <button
-      className={`${className} Button Button_${color}`} type={type}
+      className={`${className} Button Button_${color}`}
+      type={type}
       {...props}
     >
-    </button>);
+      {children}
+    </button>
+  );
 
 export default Button;
