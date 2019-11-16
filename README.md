@@ -2,7 +2,7 @@
 
 ##### Generates a summary of the top five-starred public Github repositories for the user.
 
-![app screenshot](./public/app_screenshot.png)
+![app screenshot](./public/app_shot.png)
 
 ...but you can do anything you want with the view layer given what's available in the GitHub API and the permissions assigned to your [GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
 
