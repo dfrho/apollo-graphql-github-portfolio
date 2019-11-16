@@ -2,8 +2,12 @@
 
 ##### Generates a summary of the last five public Github repositories for the user
 
-In an .env file in source directory add your own [GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/) defined as `REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN=notARealToekn123456789`
+![app screenshot](./public/app_screenshot.png)
+
+...but you can do anything you want with the view layer given what's available in the GitHub API and the permissions assigned to your [GitHub personal access token](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/).
+
+In an .env file in source directory add your GitHub personal access token defined as `REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN=notARealToekn123456789`.
 
 Clone the repo, then in the project directory, you can run:
 
-### `yarn install && yarn start`
+`yarn install && yarn start`
