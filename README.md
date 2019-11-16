@@ -1,6 +1,6 @@
 ## React Application Using GraphQL and Apollo Client Consuming the GitHub API
 
-##### Generates a summary of the last five public Github repositories for the user
+##### Generates a summary of the top five-starred public Github repositories for the user.
 
 ![app screenshot](./public/app_screenshot.png)
 
