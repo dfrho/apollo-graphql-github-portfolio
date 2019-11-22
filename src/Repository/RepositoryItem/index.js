@@ -18,7 +18,7 @@ const VIEWER_SUBSCRIPTIONS = {
   UNSUBSCRIBED: 'UNSUBSCRIBED',
 };
 
-const isWatch = viewerSubscription =>
+const isWatching = viewerSubscription =>
   viewerSubscription === VIEWER_SUBSCRIPTIONS.SUBSCRIBED;
 
 const updateWatch = (
@@ -106,6 +106,19 @@ const getUpdatedStarData = (client, id, viewerHasStarred) => {
   };
 };
 
+const optimisticStarring = (viewerHasStarred, id) => {
+  return {
+    addStar: {
+      __typename: 'Mutation',
+      starrable: {
+        __typename: 'Repository',
+        id,
+        viewerHasStarred: !viewerHasStarred,
+      },
+    },
+  }
+}
+
 const RepositoryItem = ({
   id,
   name,
@@ -129,7 +142,7 @@ const RepositoryItem = ({
             mutation={WATCH_REPOSITORY}
             variables={{
               id,
-              viewerSubscription: isWatch(viewerSubscription)
+              viewerSubscription: isWatching(viewerSubscription)
                 ? VIEWER_SUBSCRIPTIONS.UNSUBSCRIBED
                 : VIEWER_SUBSCRIPTIONS.SUBSCRIBED,
             }}
@@ -139,7 +152,7 @@ const RepositoryItem = ({
                 subscribable: {
                   __typename: 'Repository',
                   id,
-                  viewerSubscription: isWatch(viewerSubscription)
+                  viewerSubscription: isWatching(viewerSubscription)
                     ? VIEWER_SUBSCRIPTIONS.UNSUBSCRIBED
                     : VIEWER_SUBSCRIPTIONS.SUBSCRIBED,
                 },
@@ -154,7 +167,7 @@ const RepositoryItem = ({
                 onClick={updateSubscription}
               >
                 {watchers.totalCount}{' '}
-                {isWatch(viewerSubscription) ? 'Unwatch' : 'Watch'}
+                {isWatching(viewerSubscription) ? 'Unwatch' : 'Watch'}
               </Button>
             )}
           </Mutation>
@@ -163,6 +176,7 @@ const RepositoryItem = ({
             <Mutation
               mutation={STAR_REPOSITORY}
               variables={{ id }}
+              optimisticResponse={optimisticStarring(viewerHasStarred, id)}
               update={updateAddStar}
             >
               {(addStar, { data, loading, error }) => (
@@ -178,6 +192,7 @@ const RepositoryItem = ({
               <Mutation
                 mutation={UNSTAR_REPOSITORY}
                 variables={{ id }}
+                optimisticResponse={optimisticStarring(viewerHasStarred, id)}
                 update={updateRemoveStar}
               >
                 {(removeStar, { data, loading, error }) => (
@@ -213,6 +228,7 @@ const RepositoryItem = ({
           </div>
         </div>
       </div>
+
     </div>
   );
 
