@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-
 import FetchMore from '../../FetchMore';
 import RepositoryItem from '../RepositoryItem';
 
