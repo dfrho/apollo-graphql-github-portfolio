@@ -18,30 +18,31 @@ class App extends Component {
   render() {
     const { organizationName } = this.state;
 
-    return (<Router>
-      <div className="App">
-        <Navigation
-          organizationName={organizationName}
-          onOrganizationSearch={this.onOrganizationSearch}
-        />
-        <div className="App-main">
-          <Route
-            exact
-            path={routes.ORGANIZATION}
-            component={() => (
-              <div className="App-content_large-header">
-                <Organization organizationName={organizationName} />
-              </div>)}
-          /> <Route
-            exact
-            path={routes.PROFILE}
-            component={() => (
-              <div className="App-content_small-header">
-                <Profile />
-              </div>)}
-          /> </div>
-      </div>
-    </Router>
+    return (
+      <Router>
+        <div className="App">
+          <Navigation
+            organizationName={organizationName}
+            onOrganizationSearch={this.onOrganizationSearch}
+          />
+          <div className="App-main">
+            <Route
+              exact
+              path={routes.ORGANIZATION}
+              component={() => (
+                <div className="App-content_large-header">
+                  <Organization organizationName={organizationName} />
+                </div>)}
+            /> <Route
+              exact
+              path={routes.PROFILE}
+              component={() => (
+                <div className="App-content_small-header">
+                  <Profile />
+                </div>)}
+            /> </div>
+        </div>
+      </Router>
     );
   }
 }
