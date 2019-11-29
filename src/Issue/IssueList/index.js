@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from 'react-apollo';
+import { Query, ApolloConsumer } from 'react-apollo';
 import { withState } from 'recompose';
 
 import { GET_ISSUES_OF_REPOSITORY } from './queries';
@@ -52,6 +52,49 @@ const updateQuery = (previousResult, { fetchMoreResult }) => {
   };
 };
 
+const prefetchIssues = (
+  client,
+  repositoryOwner,
+  repositoryName,
+  issueState,
+) => {
+  const nextIssueState = TRANSITION_STATE[issueState];
+
+  if (isShow(nextIssueState)) {
+    client.query({
+      query: GET_ISSUES_OF_REPOSITORY,
+      variables: {
+        repositoryOwner,
+        repositoryName,
+        issueState: nextIssueState,
+      },
+    });
+  }
+};
+
+const IssueFilter = ({
+  issueState,
+  onChangeIssueState,
+  repositoryOwner,
+  repositoryName,
+}) => (
+    <ApolloConsumer>
+      {client => (
+        <ButtonUnobtrusive
+          onClick={() => onChangeIssueState(TRANSITION_STATE[issueState])}
+          onMouseOver={() => prefetchIssues(
+            client,
+            repositoryOwner,
+            repositoryName,
+            issueState,
+          )}
+        >
+          {TRANSITION_LABELS[issueState]}
+        </ButtonUnobtrusive>
+      )}
+    </ApolloConsumer>
+  )
+
 const Issues = ({
   repositoryOwner,
   repositoryName,
@@ -59,11 +102,12 @@ const Issues = ({
   onChangeIssueState,
 }) => (
     <div className="Issues">
-      <ButtonUnobtrusive
-        onClick={() => onChangeIssueState(TRANSITION_STATE[issueState])}
-      >
-        {TRANSITION_LABELS[issueState]}
-      </ButtonUnobtrusive>
+      <IssueFilter
+        issueState={issueState}
+        onChangeIssueState={onChangeIssueState}
+        repositoryOwner={repositoryOwner}
+        repositoryName={repositoryName}
+      />
 
       {isShow(issueState) && (
         <Query
