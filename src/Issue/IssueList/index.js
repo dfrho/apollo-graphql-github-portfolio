@@ -1,11 +1,12 @@
 import React from 'react';
 import { Query } from 'react-apollo';
-import gql from 'graphql-tag';
 import { withState } from 'recompose';
 
+import { GET_ISSUES_OF_REPOSITORY } from './queries';
 import IssueItem from '../IssueItem';
 import Loading from '../../Loading';
 import ErrorMessage from '../../Error';
+import FetchMore from '../../FetchMore';
 import { ButtonUnobtrusive } from '../../Button';
 
 import './style.css';
@@ -30,24 +31,26 @@ const TRANSITION_STATE = {
 
 const isShow = issueState => issueState !== ISSUE_STATES.NONE;
 
-const GET_ISSUES_OF_REPOSITORY = gql`
-  query($repositoryOwner: String!, $repositoryName: String!) {
-    repository(name: $repositoryName, owner: $repositoryOwner) {
-      issues(first: 5) {
-        edges {
-          node {
-            id
-            number
-            state
-            title
-            url
-            bodyHTML
-          }
-        }
-      }
-    }
+const updateQuery = (previousResult, { fetchMoreResult }) => {
+  if (!fetchMoreResult) {
+    return previousResult;
   }
-`;
+
+  return {
+    ...previousResult,
+    repository: {
+      ...previousResult.repository,
+      issues: {
+        ...previousResult.repository.issues,
+        ...fetchMoreResult.repository.issues,
+        edges: [
+          ...previousResult.repository.issues.edges,
+          ...fetchMoreResult.repository.issues.edges,
+        ],
+      },
+    },
+  };
+};
 
 const Issues = ({
   repositoryOwner,
@@ -56,7 +59,6 @@ const Issues = ({
   onChangeIssueState,
 }) => (
     <div className="Issues">
-
       <ButtonUnobtrusive
         onClick={() => onChangeIssueState(TRANSITION_STATE[issueState])}
       >
@@ -69,9 +71,11 @@ const Issues = ({
           variables={{
             repositoryOwner,
             repositoryName,
+            issueState,
           }}
+          notifyOnNetworkStatusChange={true}
         >
-          {({ data, loading, error }) => {
+          {({ data, loading, error, fetchMore }) => {
             if (error) {
               return <ErrorMessage error={error} />;
             }
@@ -94,21 +98,51 @@ const Issues = ({
               return <div className="IssueList">No issues ...</div>;
             }
 
-            return <IssueList issues={filteredRepository.issues} />;
+            return (
+              <IssueList
+                issues={repository.issues}
+                loading={loading}
+                repositoryOwner={repositoryOwner}
+                repositoryName={repositoryName}
+                issueState={issueState}
+                fetchMore={fetchMore}
+              />
+            );
           }}
         </Query>
-      )} </div>
+      )}
+    </div>
   );
 
+const IssueList = ({
+  issues,
+  loading,
+  repositoryOwner,
+  repositoryName,
+  issueState,
+  fetchMore,
+}) => (
+    <div className="IssueList">
+      {issues.edges.map(({ node }) => (
+        <IssueItem key={node.id} issue={node} />
+      ))}
 
-
-const IssueList = ({ issues }) => (
-  <div className="IssueList">
-    {issues.edges.map(({ node }) => (
-      <IssueItem key={node.id} issue={node} />
-    ))}
-  </div>
-);
+      <FetchMore
+        loading={loading}
+        hasNextPage={issues.pageInfo.hasNextPage}
+        variables={{
+          cursor: issues.pageInfo.endCursor,
+          repositoryOwner,
+          repositoryName,
+          issueState,
+        }}
+        updateQuery={updateQuery}
+        fetchMore={fetchMore}
+      >
+        Issues
+    </FetchMore>
+    </div>
+  );
 
 export default withState(
   'issueState',
